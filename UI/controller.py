@@ -19,12 +19,36 @@ class Controller:
             return
 
         res = self._model.umidita_media(self._mese)
-        self._view.lst_result.controls.append(res)
+        for r in res:
+            self._view.lst_result.controls.append(ft.Text(f"{r}: {res[r]}"))
+        self._view.update_page()
 
 
     def handle_sequenza(self, e):
-        pass
+        if self._mese == 0:
+            self._view.create_alert("Inserire un mese")
+            return
+        res = self._model.citta_visitate(self._mese)
+        for r in res:
+            self._view.lst_result.controls.append(ft.Text(f"{r}"))
+        self._view.update_page()
 
     def read_mese(self, e):
         self._mese = int(e.control.value)
+
+"""
+ if len(sol) > 15:
+    calcoli costo
+    confronti il costo
+ 
+ for i in range(i*3, (1+1)*3 )
+    scelto = records[i]
+    
+    soluzione.append(scelto)
+    
+    funzione(livello +1, )
+    
+    scelto.pop()
+
+"""
 
