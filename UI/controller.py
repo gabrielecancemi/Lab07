@@ -14,8 +14,12 @@ class Controller:
         self._mese = 0
 
     def handle_umidita_media(self, e):
-        pass
+        if self._mese == 0:
+            self._view.create_alert("Inserire un mese")
+            return
 
+        res = self._model.umidita_media(self._mese)
+        self._view.lst_result.controls.append(res)
 
 
     def handle_sequenza(self, e):
