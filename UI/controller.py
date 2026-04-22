@@ -28,7 +28,8 @@ class Controller:
         if self._mese == 0:
             self._view.create_alert("Inserire un mese")
             return
-        res = self._model.citta_visitate(self._mese)
+        res, costo = self._model.citta_visitate(self._mese)
+        self._view.lst_result.controls.append(ft.Text(f"Costo totale: {costo}"))
         for r in res:
             self._view.lst_result.controls.append(ft.Text(f"{r}"))
         self._view.update_page()

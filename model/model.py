@@ -1,3 +1,5 @@
+import copy
+
 from database import meteo_dao
 from database.meteo_dao import MeteoDao
 
@@ -6,7 +8,7 @@ class Model:
     def __init__(self):
         self._mappa_situazioni = None
         self.soluzione = []
-        self.costo = 100000
+        self.costo = None
         self.counter = {"Torino": 0, "Milano": 0, "Genova": 0}
 
 
@@ -43,32 +45,56 @@ class Model:
             if s.data.month == _mese and s.data.day <= 15:
                 da_visitare.append(s)
 
+        self.soluzione = []
+        self.costo = 100000
+
         da_visitare.sort(key=lambda x: x.data)
+        print(da_visitare)
         self.ricorsione(da_visitare, [], 0, 0)
-        return self.soluzione
+        print(self.soluzione)
+        return self.soluzione, self.costo
 
 
     def ricorsione(self, da_visitare, soluzione, step, costo):
         lun = len(soluzione)
         if lun == 15:
             if self.costo > costo:
-                self.soluzione = soluzione
+                self.soluzione = copy.deepcopy(soluzione)
                 self.costo = costo
-                #print("ho finito")
+                print(soluzione)
         else:
             for i in range(step*3, (step+1) * 3):
                 citta = da_visitare[i].localita
-                if self.counter[citta] < 6 and costo < self.costo:
+                if self.controlla_step(soluzione, citta, costo):
                     soluzione.append(da_visitare[i])
-                    self.counter[citta] += 1
                     aggiunta = 0
-                    if len(soluzione) > 1 and soluzione[step].localita != soluzione[step-1].localita:
+                    if len(soluzione) > 1 and soluzione[-1].localita != soluzione[-2].localita:
                         aggiunta = 100
                     self.ricorsione(da_visitare, soluzione, step+1, (costo + da_visitare[i].umidita + aggiunta))
-
-                    costo -= aggiunta
-                    costo -= da_visitare[i].umidita
                     soluzione.pop()
+
+
+    def controlla_step(self, soluzione, citta, costo):
+        contatore = 0
+        for s in soluzione:
+            if s.localita == citta:
+                contatore += 1
+
+        if contatore >= 6 or costo > self.costo:
+            return False
+
+        if len(soluzione) < 3 and len(soluzione) > 0 and soluzione[-1].localita != citta:
+            return False
+        if len(soluzione) > 3:
+            primo = soluzione[-1].localita
+            secondo = soluzione[-2].localita
+            terzo = soluzione[-3].localita
+            if not (primo == secondo and secondo == terzo):
+                if primo != citta:
+                    return False
+
+        return True
+
 
 
 
